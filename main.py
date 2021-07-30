@@ -6,8 +6,10 @@ rol_user = ["admin", "agent"]
 
 user = True
 
-server_token = "12345"
-user_token = None
+# contraseñas usadas "1234"
+
+server_token = None
+user_token = {"expired_date": datetime.datetime.today(), "token": "invite"}
 
 while user != False:
     funcs.menu()
@@ -42,24 +44,29 @@ while user != False:
         user_name = input("Name: ")
         user_pwd = input("Password: ")
         users = funcs.read_json("users.json")
-
         encontrado = False
-        user_token = None
+        user_token = {"expired_date": datetime.datetime.today(), "token": "invite"}
+        server_token = None
+
         for user in users["data"]:
             if user["name"] == user_name:
                 encontrado = True
                 if bcrypt.checkpw(user_pwd.encode(), user["pwd"].encode()):
-                    if user["rol"] == "admin":
-                        user_token = server_token
                     print("Log in...")
+                    user_token = {"expired_date": datetime.datetime.today(), "token": bcrypt.hashpw(user_pwd.encode(), bcrypt.gensalt())}
+                    if user["rol"] == "admin":
+                        server_token = user_token["token"] # Asignamos server_token para que tenga acceso a la zona restringida
                 else:
                     print("Password incorrecto")
         if encontrado == False:
             print("Usuario no encontrado")
 
     elif user == "3": # comprobar token
-        if server_token == user_token:
-            print("-----------------------")
-            print("ZONA RESTRINGIDA")
-            print("Acceso permitido...")
-            user = input("")
+        if user_token:
+            if (user_token["expired_date"] + datetime.timedelta(seconds=10)) > datetime.datetime.today():
+                #if bcrypt.checkpw(server_token.encode(), user_token["token"]):
+                if user_token["token"] == server_token:
+                    print("-----------------------")
+                    print("ZONA RESTRINGIDA")
+                    print("Acceso permitido...")
+                    user = input("")
