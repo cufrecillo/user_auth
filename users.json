@@ -1,0 +1,14 @@
+{
+    "data": [
+        {
+            "name": "prueba1",
+            "pwd": "1234",
+            "user_since": "2021-07-30"
+        },
+        {
+            "name": "prueba2",
+            "pwd": "12345",
+            "user_since": "2021-07-30"
+        }
+    ]
+}
